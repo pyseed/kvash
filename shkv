@@ -1,0 +1,32 @@
+#!/bin/bash
+version="0.0.1"
+
+errorBanner="$(cat <<-EOF
+error during command or command not found.
+type ./shell help for help."
+EOF
+)"
+
+helpMessage="$(cat <<-EOF
+HELP
+----
+
+help:
+./shell help
+
+EOF
+)"
+
+help () {
+    echo "${helpMessage}"
+    exit
+}
+
+#
+# BODY
+#
+command="$1"
+[ -z ${command} ] && help
+cwd=$(pwd)
+echo "version: ${version}, command: ${command}"
+declare -F ${command} &> /dev/null && ${command} ${@:2} || echo "${errorBanner}"
