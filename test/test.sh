@@ -166,6 +166,17 @@ cmpFile /tmp/shkv_foreach.txt ./check/foreach.txt
 rm /tmp/shkv_foreach.txt 2> /dev/null
 
 
+#
+# dict set
+#
+echo ""
+echo "dict set"
+rm "${SHKV_STORE}/hello" 2> /dev/null
+../shkv dict set hello one oneword "comment of one"
+../shkv dict set hello two twoword "comment of two"
+testKey hello dictSet.txt
+
+
 echo ""
 echo ""
 [ "${anyFail}" = "true" ] && echo "TEST FAILED" || echo "TEST SUCCESS"

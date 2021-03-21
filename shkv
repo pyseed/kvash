@@ -41,6 +41,9 @@ item is passed as $1 in callback
 export -f callback
 shkv list foreach callback
 
+dict set prop:
+shkv dict set key prop value comment
+
 EOF
 )"
 
@@ -143,6 +146,33 @@ list_foreach () {
     local callback="$2"
 
     while read item; do "${callback}" "${item}"; done < "${store}/${key}"
+}
+
+
+#
+# list key ...args
+#
+dict () {
+    local dictCommand="$1"
+    local dictCommandFunctionName="$1"
+
+    # command wrappers (when a command name is bash expression...)
+    case "${dictCommand}" in
+        set) dictCommandFunctionName="setProp";;
+    esac
+
+    declare -F "dict_${dictCommandFunctionName}" &> /dev/null && "dict_${dictCommandFunctionName}" ${@:2} || echo "${errorBanner}"
+}
+
+# dict set key prop value comment
+dict_setProp () {
+    local key="$1"
+    local prop="$2"
+    local value="$3"
+    local comment="${*:4}"
+
+    list_add "${key}" "# [${prop}] $comment"
+    list_add "${key}" "${prop}=${value}"
 }
 
 #
