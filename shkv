@@ -26,6 +26,16 @@ shkv appendr key value
 get key file full path:
 shkv path key
 
+remove key:
+shkv del key
+
+list add item:
+shkv list add key item
+
+list del item:
+shkv list del key
+if you need no duplicates: before list add you can always call list del
+
 EOF
 )"
 
