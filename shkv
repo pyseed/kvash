@@ -25,8 +25,21 @@ help () {
 #
 # BODY
 #
+main () {
+[ -z ${command} ] && command="help"
+    store=${SHKV_STORE}
+    if [ "${command}" != "help" ] && [ "${store}" = "" ]; then
+        echo "aborted. target store absolute path should be pointed with SHKV_STORE environment variable"
+        exit
+    fi
+
+    cwd=$(pwd)
+    echo "version: ${version}, command: ${command}"
+    declare -F ${command} &> /dev/null && ${command} ${@:2} || echo "${errorBanner}"
+}
+
 command="$1"
-[ -z ${command} ] && help
+store=${SHKV_STORE}
 cwd=$(pwd)
-echo "version: ${version}, command: ${command}"
-declare -F ${command} &> /dev/null && ${command} ${@:2} || echo "${errorBanner}"
+
+main ${@:2}
