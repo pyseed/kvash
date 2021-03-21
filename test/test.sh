@@ -27,7 +27,7 @@ testKey () {
 # cmpFile result expected
 cmpFile () {
     local result="$1"
-    local expected="$1"
+    local expected="$2"
 
     echo "cmpFile / result: ${result}, expected=${expected}"
     if diff -u "${result}" "${expected}"; then
@@ -99,6 +99,34 @@ echo ""
 echo "path"
 result=$(../shkv path hello)
 cmpResult "${result}" "${SHKV_STORE}/hello"
+
+
+#
+# del
+#
+echo ""
+echo "del"
+setKey hello world
+../shkv del hello
+if [ ! -f "${SHKV_STORE}/hello" ]; then
+    echo "SUCCESS"
+else
+    echo "FAIL"
+    anyFail="true"
+fi
+
+#
+# list add
+#
+echo ""
+echo "list add"
+rm "${SHKV_STORE}/hello"
+../shkv list add hello item1
+testKey hello listAdd1.txt
+
+../shkv list add hello item2
+testKey hello listAdd2.txt
+
 
 echo ""
 echo ""

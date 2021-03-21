@@ -63,8 +63,12 @@ appendr () {
     local key="$1"
     local value="${*:2}"
 
-    echo "" >> "${store}/${key}"
-    echo  -n "${value}" >> "${store}/${key}"
+    if [ -f "${store}/${key}" ]; then
+        echo "" >> "${store}/${key}"
+        echo -n "${value}" >> "${store}/${key}"
+    else
+        echo -n "${value}" > "${store}/${key}" 
+    fi
 }
 
 #
@@ -84,6 +88,35 @@ path () {
     local key="$1"
 
     echo "${store}/${key}"
+}
+
+
+#
+# del key
+#
+del () {
+    local key="$1"
+
+    rm "${store}/${key}"
+}
+
+
+#
+# list key ...args
+#
+list () {
+    local listCommand="$1"
+
+    declare -F "list_${listCommand}" &> /dev/null && "list_${listCommand}" ${@:2} || echo "${errorBanner}"
+}
+
+# list add key item
+list_add () {
+    local key="$1"
+    local item="$2"
+
+    echo "add ${key} ${item}"
+    appendr "${key}" "${item}"
 }
 
 #
