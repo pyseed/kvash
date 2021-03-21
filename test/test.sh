@@ -148,6 +148,24 @@ setKey hello item1
 testKey hello listDel1.txt
 
 
+#
+# list foreach
+#
+callback1 () {
+    echo "callback1: $1"
+    echo "callback1: $1" >> /tmp/shkv_foreach.txt
+}
+export -f callback1
+
+echo ""
+echo "list for"
+cat ./dataset/foreach.txt > "${SHKV_STORE}/hello"
+rm /tmp/shkv_foreach.txt 2> /dev/null
+../shkv list foreach hello callback1
+cmpFile /tmp/shkv_foreach.txt ./check/foreach.txt
+rm /tmp/shkv_foreach.txt 2> /dev/null
+
+
 echo ""
 echo ""
 [ "${anyFail}" = "true" ] && echo "TEST FAILED" || echo "TEST SUCCESS"

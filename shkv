@@ -20,7 +20,7 @@ shkv set key value
 append:
 shkv append key value
 
-append with crlf between values:
+append with crlf after value:
 shkv appendr key value
 
 get key file full path:
@@ -35,6 +35,11 @@ shkv list add key item
 list del item:
 shkv list del key
 if you need no duplicates: before list add you can always call list del
+
+list foreach key callback:
+item is passed as $1 in callback
+export -f callback
+shkv list foreach callback
 
 EOF
 )"
@@ -67,18 +72,14 @@ append () {
 
 #
 # appendr key value
-# (line between values)
+# (line after value)
 #
 appendr () {
     local key="$1"
     local value="${*:2}"
 
-    if [ -f "${store}/${key}" ]; then
-        echo "" >> "${store}/${key}"
-        echo -n "${value}" >> "${store}/${key}"
-    else
-        echo -n "${value}" > "${store}/${key}"
-    fi
+    echo -n "${value}" >> "${store}/${key}"
+    echo "" >> "${store}/${key}"
 }
 
 #
@@ -134,6 +135,14 @@ list_add () {
     local item="$2"
 
     appendr "${key}" "${item}"
+}
+
+# list for key func
+list_foreach () {
+    local key="$1"
+    local callback="$2"
+
+    while read item; do "${callback}" "${item}"; done < "${store}/${key}"
 }
 
 #
