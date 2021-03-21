@@ -38,21 +38,30 @@ cmpFile () {
     fi
 }
 
+# cmpFile result expected
+cmpResult () {
+    local result="$1"
+    local expected="$1"
+
+    if [ "${result}" = "${expected}" ]; then
+        echo "SUCCESS"
+    else
+        echo "FAIL"
+        anyFail="true"
+    fi
+}
+
 #
 # set
 #
 echo ""
 echo "set 1"
-set -
 ../shkv set hello world
-set +x
 testKey hello set1.txt
 
 echo ""
 echo "set 2"
-set -x
 ../shkv set hello "world test"
-set +x
 testKey hello set2.txt
 
 
@@ -63,17 +72,13 @@ echo ""
 echo "append"
 setKey hello world
 cat /home/vgreiner/tmp/shkv/hello
-set -
 ../shkv append hello "append entry"
-set +x
 testKey hello append.txt
 
 echo ""
 echo "appendr"
 setKey hello world
-set -
 ../shkv appendr hello "appendr entry"
-set +x
 testKey hello appendr.txt
 
 
@@ -83,10 +88,17 @@ testKey hello appendr.txt
 echo ""
 echo "get"
 setKey hello world
-set -
-../shkv get hello >> "${resultOutputFile}"
-set +x
-cmpFile "${resultOutputFile}" ./expected/get.txt
+result=$(../shkv get hello)
+cmpResult "${result}" world
+
+
+#
+# path
+#
+echo ""
+echo "path"
+result=$(../shkv path hello)
+cmpResult "${result}" "${SHKV_STORE}/hello"
 
 echo ""
 echo ""

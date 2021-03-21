@@ -11,19 +11,26 @@ helpMessage="$(cat <<-EOF
 HELP
 ----
 
+help:
 shkv help
 
+set value:
 shkv set key value
 
+append:
 shkv append key value
 
-append with crlf between values
+append with crlf between values:
 shkv appendr key value
+
+get key file full path:
+shkv path key
 
 EOF
 )"
 
 help () {
+    echo "version: ${version}"
     echo "${helpMessage}"
     exit
 }
@@ -69,6 +76,16 @@ get () {
     cat "${store}/${key}"
 }
 
+
+#
+# path key
+#
+path () {
+    local key="$1"
+
+    echo "${store}/${key}"
+}
+
 #
 # BODY
 #
@@ -86,7 +103,6 @@ main () {
         set) commandFunctionName="setVal";;
     esac
 
-    echo "version: ${version}, command: ${command}"
     declare -F ${commandFunctionName} &> /dev/null && ${commandFunctionName} $@ || echo "${errorBanner}"
 }
 
