@@ -177,6 +177,16 @@ rm "${SHKV_STORE}/hello" 2> /dev/null
 testKey hello dictSet.txt
 
 
+#
+# dict get
+#
+echo ""
+echo "dict get"
+cat ./dataset/dict.txt > "${SHKV_STORE}/hello"
+result=$(../shkv dict get hello two)
+cmpResult "${result}" twoword
+
+
 echo ""
 echo ""
 [ "${anyFail}" = "true" ] && echo "TEST FAILED" || echo "TEST SUCCESS"

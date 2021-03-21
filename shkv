@@ -3,7 +3,7 @@ version="0.0.1"
 
 errorBanner="$(cat <<-EOF
 error during command or command not found.
-type ./shell help for help."
+type shkv help for help."
 EOF
 )"
 
@@ -43,6 +43,9 @@ shkv list foreach callback
 
 dict set prop:
 shkv dict set key prop value comment
+
+dict get prop:
+shkv dict get key prop
 
 EOF
 )"
@@ -164,6 +167,21 @@ dict () {
     declare -F "dict_${dictCommandFunctionName}" &> /dev/null && "dict_${dictCommandFunctionName}" ${@:2} || echo "${errorBanner}"
 }
 
+# set internal dict content without comments
+dict_setRaw () {
+   local key="$1"
+   local source="${store}/${key}"
+   local target="${store}/${key}_"
+   
+   rm "${target}" 2> /dev/null
+   while IFS= read -r line
+   do
+      if [[ ${line::1} != "#" ]]; then
+         echo "$line" >> "${target}"
+      fi
+   done < "${source}"
+}
+
 # dict set key prop value comment
 dict_setProp () {
     local key="$1"
@@ -173,6 +191,19 @@ dict_setProp () {
 
     list_add "${key}" "# [${prop}] $comment"
     list_add "${key}" "${prop}=${value}"
+}
+
+# dict get key prop
+dict_get () {
+    local key="$1"
+    local prop="$2"
+
+    dict_setRaw "${key}"
+
+    # extract then export as variable
+    export $(get "${key}_" | (grep "${prop=}" || echo ""))
+    # get variable value
+    echo "${!prop}"
 }
 
 #
