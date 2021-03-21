@@ -139,11 +139,11 @@ testKey hello listAdd2.txt
 #
 # list del
 #
-#echo ""
-#echo "list del"
-#setKey hello item1
-#../shkv list del hello item1
-#testKey hello listDel1.txt
+echo ""
+echo "list del"
+setKey hello item1
+../shkv list del hello item1
+testKey hello listDel1.txt
 
 
 echo ""
