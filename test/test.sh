@@ -187,6 +187,16 @@ result=$(../shkv dict get hello two)
 cmpResult "${result}" twoword
 
 
+#
+# dict props
+#
+echo ""
+echo "dict props"
+cat ./dataset/dict.txt > "${SHKV_STORE}/hello"
+result=$(../shkv dict props hello)
+cmpResult "${result}" "one=oneword two=twoword three=threeword"
+
+
 echo ""
 echo ""
 [ "${anyFail}" = "true" ] && echo "TEST FAILED" || echo "TEST SUCCESS"

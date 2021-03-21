@@ -47,6 +47,10 @@ shkv dict set key prop value comment
 dict get prop:
 shkv dict get key prop
 
+dict get props as args:
+shkv dict props key
+export dollar(shkv dict props key)
+
 EOF
 )"
 
@@ -198,13 +202,22 @@ dict_get () {
     local key="$1"
     local prop="$2"
 
-    dict_setRaw "${key}"
-
     # extract then export as variable
+    dict_setRaw "${key}"
     export $(get "${key}_" | (grep "${prop=}" || echo ""))
     # get variable value
     echo "${!prop}"
 }
+
+
+# dict get key prop
+dict_props () {
+    local key="$1"
+
+    dict_setRaw "${key}"
+    get "${key}_" | xargs
+}
+
 
 #
 # BODY
