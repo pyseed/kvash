@@ -30,7 +30,7 @@ help () {
 #
 setVal () {
     local key="$1"
-    local value="$2"
+    local value="${*:2}"
 
     echo "${value}" > "${store}/${key}"
 }
