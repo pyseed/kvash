@@ -1,13 +1,16 @@
 #!/bin/bash
 export SHKV_STORE="${HOME}/tmp/shkv"
 anyFail=""
+resultOutputFile=/tmp/shkv_result.txt
 
+# force key value
+# setKey key value
 setKey () {
     local key="$1"
     local filePath="${SHKV_STORE}/${key}"
     local value="$2"
 
-    echo "SET KEY: key: ${key}, filePath=${filePath}, value: ${value}"
+    echo "setKey / key: ${key}, filePath=${filePath}, value: ${value}"
     echo  -n "${value}" > "${filePath}"
 }
 
@@ -17,8 +20,17 @@ testKey () {
     local filePath="${SHKV_STORE}/${key}"
     local testFilePath="./check/$2"
 
-    echo "TEST KEY: key: ${key}, filePath=${filePath}"
-    if diff -u "${filePath}" "${testFilePath}"; then
+    echo "testKey / key: ${key}, filePath=${filePath}"
+    cmpFile "${filePath}" "${testFilePath}"
+}
+
+# cmpFile result expected
+cmpFile () {
+    local result="$1"
+    local expected="$1"
+
+    echo "cmpFile / result: ${result}, expected=${expected}"
+    if diff -u "${result}" "${expected}"; then
         echo "SUCCESS"
     else
         echo "FAIL"
@@ -63,6 +75,18 @@ set -
 ../shkv appendr hello "appendr entry"
 set +x
 testKey hello appendr.txt
+
+
+#
+# get
+#
+echo ""
+echo "get"
+setKey hello world
+set -
+../shkv get hello >> "${resultOutputFile}"
+set +x
+cmpFile "${resultOutputFile}" ./expected/get.txt
 
 echo ""
 echo ""
