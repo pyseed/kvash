@@ -69,6 +69,10 @@ testKey hello set2.txt
 # append
 #
 echo ""
+echo "append from empty"
+rm "${SHKV_STORE}/hello"
+../shkv append hello "append entry"
+testKey hello appendFromEmpty.txt
 echo "append"
 setKey hello world
 cat /home/vgreiner/tmp/shkv/hello
@@ -76,6 +80,10 @@ cat /home/vgreiner/tmp/shkv/hello
 testKey hello append.txt
 
 echo ""
+echo "appendr from empty"
+rm "${SHKV_STORE}/hello"
+../shkv appendr hello "appendr entry"
+testKey hello appendrFromEmpty.txt
 echo "appendr"
 setKey hello world
 ../shkv appendr hello "appendr entry"
@@ -126,6 +134,16 @@ testKey hello listAdd1.txt
 
 ../shkv list add hello item2
 testKey hello listAdd2.txt
+
+
+#
+# list del
+#
+#echo ""
+#echo "list del"
+#setKey hello item1
+#../shkv list del hello item1
+#testKey hello listDel1.txt
 
 
 echo ""

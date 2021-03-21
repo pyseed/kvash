@@ -67,7 +67,7 @@ appendr () {
         echo "" >> "${store}/${key}"
         echo -n "${value}" >> "${store}/${key}"
     else
-        echo -n "${value}" > "${store}/${key}" 
+        echo -n "${value}" > "${store}/${key}"
     fi
 }
 
@@ -111,6 +111,14 @@ list () {
 }
 
 # list add key item
+list_del () {
+    local key="$1"
+    local item="$2"
+
+    cat "${store}/${key}" | (grep -q -v "${item}" || echo "") > "${store}/${key}"
+}
+
+# list del key item
 list_add () {
     local key="$1"
     local item="$2"
