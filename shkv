@@ -12,7 +12,10 @@ HELP
 ----
 
 help:
-./shell help
+shkv help
+
+set value:
+shkv set key value
 
 EOF
 )"
@@ -20,6 +23,16 @@ EOF
 help () {
     echo "${helpMessage}"
     exit
+}
+
+#
+# set key value
+#
+setVal () {
+    local key="$1"
+    local value="$2"
+
+    echo "${value}" > "${store}/${key}"
 }
 
 #
@@ -32,13 +45,19 @@ main () {
         echo "aborted. target store absolute path should be pointed with SHKV_STORE environment variable"
         exit
     fi
+    mkdir -p "${store}"
 
-    cwd=$(pwd)
+    # command wrappers (when a command name is bash expression...)
+    case "${command}" in
+        set) commandFunctionName="setVal";;
+    esac
+
     echo "version: ${version}, command: ${command}"
-    declare -F ${command} &> /dev/null && ${command} ${@:2} || echo "${errorBanner}"
+    declare -F ${commandFunctionName} &> /dev/null && ${commandFunctionName} $@ || echo "${errorBanner}"
 }
 
 command="$1"
+commandFunctionName="$1"
 store=${SHKV_STORE}
 cwd=$(pwd)
 
