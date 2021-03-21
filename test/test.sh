@@ -51,101 +51,149 @@ cmpResult () {
     fi
 }
 
+# beginTest key
+beginTest () {
+    local key="$1"
+
+    echo ""
+    echo "----------"
+    echo "${key}"
+    echo "----------"
+    echo ""
+    rm "${SHKV_STORE}/${key}" 2> /dev/null
+}
+
+# endTest key
+endTest () {
+    local key="$1"
+
+    echo ">"
+    cat "${SHKV_STORE}/${key}"
+    rm "${SHKV_STORE}/${key}" 2> /dev/null
+    echo "--"
+    echo ""
+}
+
 #
 # set
 #
+beginTest test_set
+
 echo ""
 echo "set 1"
-../shkv set hello world
-testKey hello set1.txt
+../shkv set test_set world
+testKey test_set set1.txt
 
 echo ""
 echo "set 2"
-../shkv set hello "world test"
-testKey hello set2.txt
+../shkv set test_set "world test"
+testKey test_set set2.txt
+
+endTest test_set
 
 
 #
 # append
 #
+beginTest test_append
+
 echo ""
 echo "append from empty"
-rm "${SHKV_STORE}/hello"
-../shkv append hello "append entry"
-testKey hello appendFromEmpty.txt
+../shkv append append "append entry"
+testKey append appendFromEmpty.txt
+
+echo ""
 echo "append"
-setKey hello world
-cat /home/vgreiner/tmp/shkv/hello
-../shkv append hello "append entry"
-testKey hello append.txt
+setKey append world
+../shkv append append "append entry"
+testKey append append.txt
+
+endTest test_append
+
+
+#
+# appendr
+#
+beginTest test_appendr
 
 echo ""
 echo "appendr from empty"
-rm "${SHKV_STORE}/hello"
-../shkv appendr hello "appendr entry"
-testKey hello appendrFromEmpty.txt
+../shkv appendr test_appendr "appendr entry"
+testKey test_appendr appendrFromEmpty.txt
+
+echo ""
 echo "appendr"
-setKey hello world
-../shkv appendr hello "appendr entry"
-testKey hello appendr.txt
+setKey test_appendr world
+../shkv appendr test_appendr "appendr entry"
+testKey test_appendr appendr.txt
+
+endTest test_appendr
 
 
 #
 # get
 #
-echo ""
-echo "get"
-setKey hello world
-result=$(../shkv get hello)
+beginTest test_get
+
+setKey test_get world
+result=$(../shkv get test_get)
 cmpResult "${result}" world
+
+endTest test_get
 
 
 #
 # path
 #
-echo ""
-echo "path"
-result=$(../shkv path hello)
-cmpResult "${result}" "${SHKV_STORE}/hello"
+beginTest test_path
+
+result=$(../shkv path test_path)
+cmpResult "${result}" "${SHKV_STORE}/test_path"
+
+endTest test_path
 
 
 #
 # del
 #
-echo ""
-echo "del"
-setKey hello world
-../shkv del hello
-if [ ! -f "${SHKV_STORE}/hello" ]; then
+beginTest test_del
+
+setKey test_del world
+../shkv del test_del
+if [ ! -f "${SHKV_STORE}/test_del" ]; then
     echo "SUCCESS"
 else
     echo "FAIL"
     anyFail="true"
 fi
 
+endTest test_del
+
 
 #
 # list add
 #
-echo ""
-echo "list add"
-rm "${SHKV_STORE}/hello" 2> /dev/null
-../shkv list add hello item1
-testKey hello listAdd1.txt
+beginTest test_list_add
 
-# item2
-../shkv list add hello item2
-testKey hello listAdd2.txt
+../shkv list add test_list_add item1
+testKey test_list_add listAdd1.txt
+../shkv list add test_list_add item2
+testKey test_list_add listAdd2.txt
+
+endTest test_list_add
 
 
 #
 # list del
 #
-echo ""
-echo "list del"
-setKey hello item1
-../shkv list del hello item1
-testKey hello listDel1.txt
+beginTest test_list_del
+cat ./dataset/listDel.txt > "${SHKV_STORE}/test_list_del"
+
+../shkv list del test_list_del item2
+testKey test_list_del listDel.txt
+# item2item2 should not be destroyed by item2 del
+
+endTest test_list_del
 
 
 #
@@ -157,44 +205,63 @@ callback1 () {
 }
 export -f callback1
 
-echo ""
-echo "list for"
-cat ./dataset/foreach.txt > "${SHKV_STORE}/hello"
-rm /tmp/shkv_foreach.txt 2> /dev/null
-../shkv list foreach hello callback1
+beginTest test_list_foreach
+cat ./dataset/listForeach.txt > "${SHKV_STORE}/test_list_foreach"
+
+../shkv list foreach test_list_foreach callback1
 cmpFile /tmp/shkv_foreach.txt ./check/foreach.txt
+
 rm /tmp/shkv_foreach.txt 2> /dev/null
+endTest test_list_foreach
 
 
 #
 # dict set
 #
-echo ""
-echo "dict set"
-rm "${SHKV_STORE}/hello" 2> /dev/null
-../shkv dict set hello one oneword "comment of one"
-../shkv dict set hello two twoword "comment of two"
-testKey hello dictSet.txt
+beginTest test_dict_set
+
+../shkv dict set test_dict_set one oneword "comment of one"
+../shkv dict set test_dict_set two twoword "comment of two"
+testKey test_dict_set dictSet.txt
+
+endTest test_dict_set
 
 
 #
 # dict get
 #
-echo ""
-echo "dict get"
-cat ./dataset/dict.txt > "${SHKV_STORE}/hello"
-result=$(../shkv dict get hello two)
+beginTest test_dict_get
+cat ./dataset/dict.txt > "${SHKV_STORE}/test_dict_get"
+
+result=$(../shkv dict get test_dict_get two)
 cmpResult "${result}" twoword
+
+endTest test_dict_get
 
 
 #
 # dict props
 #
-echo ""
-echo "dict props"
-cat ./dataset/dict.txt > "${SHKV_STORE}/hello"
-result=$(../shkv dict props hello)
-cmpResult "${result}" "one=oneword two=twoword three=threeword"
+beginTest test_dict_props
+cat ./dataset/dict.txt > "${SHKV_STORE}/test_dict_props"
+
+result=$(../shkv dict props test_dict_props)
+cmpResult "${result}" "one=oneword two=twoword twotwo=twotwoword three=threeword"
+
+endTest test_dict_props
+
+
+#
+# dict del
+#
+beginTest test_dict_del
+cat ./dataset/dict.txt > "${SHKV_STORE}/test_dict_del"
+
+../shkv dict del test_dict_del two
+#result=$(../shkv dict del test_dict_del two)
+#testKey hello dictDel.txt
+
+endTest test_dict_del
 
 
 echo ""

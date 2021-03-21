@@ -51,6 +51,9 @@ dict get props as args:
 shkv dict props key
 export dollar(shkv dict props key)
 
+dict del prop:
+shkv dict del key prop
+
 EOF
 )"
 
@@ -132,19 +135,19 @@ list () {
 }
 
 # list add key item
-list_del () {
-    local key="$1"
-    local item="$2"
-
-    cat "${store}/${key}" | (grep -q -v "${item}" || echo "") > "${store}/${key}"
-}
-
-# list del key item
 list_add () {
     local key="$1"
     local item="$2"
 
     appendr "${key}" "${item}"
+}
+
+# list del key item
+list_del () {
+    local key="$1"
+    local item="$2"
+
+    cat "${store}/${key}" | (grep -v "^${item}" || cat "${store}/${key}") > "${store}/${key}"
 }
 
 # list for key func
@@ -176,14 +179,8 @@ dict_setRaw () {
    local key="$1"
    local source="${store}/${key}"
    local target="${store}/${key}_"
-   
-   rm "${target}" 2> /dev/null
-   while IFS= read -r line
-   do
-      if [[ ${line::1} != "#" ]]; then
-         echo "$line" >> "${target}"
-      fi
-   done < "${source}"
+
+   cat "${source}" | (grep -v '^#' || cat "${source}") > "${target}"
 }
 
 # dict set key prop value comment
@@ -204,11 +201,10 @@ dict_get () {
 
     # extract then export as variable
     dict_setRaw "${key}"
-    export $(get "${key}_" | (grep "${prop=}" || echo ""))
+    export $(get "${key}_" | (grep "${prop}=" | echo ""))
     # get variable value
     echo "${!prop}"
 }
-
 
 # dict get key prop
 dict_props () {
@@ -216,6 +212,22 @@ dict_props () {
 
     dict_setRaw "${key}"
     get "${key}_" | xargs
+}
+
+
+# dict del key prop
+dict_del () {
+    local key="$1"
+    local prop="$2"
+
+    echo "grep test"
+    cat "${store}/${key}" | grep '^#'
+
+    # IMPORTANT: match start word ^ to prevent from removing entries that are not exact (like ending by prop)
+    # remove comment
+    cat "${store}/${key}" | (grep -v '# \\[two\\]' || cat "${store}/${key}") > "${store}/${key}"
+    # remove value
+    cat "${store}/${key}" | (grep -v "^${prop}=" || cat "${store}/${key}") > "${store}/${key}"
 }
 
 
