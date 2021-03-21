@@ -123,15 +123,17 @@ else
     anyFail="true"
 fi
 
+
 #
 # list add
 #
 echo ""
 echo "list add"
-rm "${SHKV_STORE}/hello"
+rm "${SHKV_STORE}/hello" 2> /dev/null
 ../shkv list add hello item1
 testKey hello listAdd1.txt
 
+# item2
 ../shkv list add hello item2
 testKey hello listAdd2.txt
 

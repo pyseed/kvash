@@ -123,7 +123,6 @@ list_add () {
     local key="$1"
     local item="$2"
 
-    echo "add ${key} ${item}"
     appendr "${key}" "${item}"
 }
 
