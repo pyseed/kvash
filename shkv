@@ -11,11 +11,14 @@ helpMessage="$(cat <<-EOF
 HELP
 ----
 
-help:
 shkv help
 
-set value:
 shkv set key value
+
+shkv append key value
+
+append with crlf between values
+shkv appendr key value
 
 EOF
 )"
@@ -32,7 +35,30 @@ setVal () {
     local key="$1"
     local value="${*:2}"
 
-    echo "${value}" > "${store}/${key}"
+    echo -n "${value}" > "${store}/${key}"
+}
+
+#
+# append key value
+#
+append () {
+    local key="$1"
+    local value="${*:2}"
+
+    echo  -n "${value}" >> "${store}/${key}"
+}
+
+
+#
+# appendr key value
+# (line between values)
+#
+appendr () {
+    local key="$1"
+    local value="${*:2}"
+
+    echo "" >> "${store}/${key}"
+    echo  -n "${value}" >> "${store}/${key}"
 }
 
 #
