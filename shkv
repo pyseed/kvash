@@ -147,7 +147,10 @@ list_del () {
     local key="$1"
     local item="$2"
 
-    cat "${store}/${key}" | (grep -v "^${item}" || cat "${store}/${key}") > "${store}/${key}"
+    # IMPORTANT: match exact word ^*$ to prevent from removing entries that are not exact (like ending by prop)
+    # IMPORTANT: target file can not be the source file, a pivot file is used
+    cat "${store}/${key}" | (grep -v "^${item}\$" || cat "${store}/${key}") > "${store}/${key}.tmp"
+    mv -f "${store}/${key}.tmp" "${store}/${key}"
 }
 
 # list for key func
