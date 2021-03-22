@@ -204,7 +204,7 @@ dict_get () {
 
     # extract then export as variable
     dict_setRaw "${key}"
-    export $(get "${key}_" | (grep "${prop}=" | echo ""))
+    export $(get "${key}_" | (grep "^${prop}=" || echo ""))
     # get variable value
     echo "${!prop}"
 }

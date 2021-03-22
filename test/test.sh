@@ -1,279 +1,234 @@
 #!/bin/bash
 export SHKV_STORE="${HOME}/tmp/shkv"
-anyFail=""
-resultOutputFile=/tmp/shkv_result.txt
+#verbose=true
 
-# force key value
-# setKey key value
-setKey () {
-    local key="$1"
-    local filePath="${SHKV_STORE}/${key}"
-    local value="$2"
+# lib.sh.beginTest will set current test name in "${current}"
+. lib.sh
 
-    echo "setKey / key: ${key}, filePath=${filePath}, value: ${value}"
-    echo  -n "${value}" > "${filePath}"
+listForeachCallback () {
+    echo "listForeachCallback: $1"
+    echo "listForeachCallback: $1" >> /tmp/shkv_foreach.txt
+}
+export -f listForeachCallback
+
+serie () {
+    #
+    # set1
+    #
+    beginTest set1
+
+    ../shkv set "${current}" world
+    testKeyValue world
+
+    endTest
+
+
+    #
+    # set2
+    #
+    beginTest set2
+
+    ../shkv set "${current}" "world test"
+    testKeyValue "world test"
+
+    endTest
+
+
+    #
+    # get
+    #
+    beginTest get
+
+    setKey "${current}" world
+    result=$(../shkv get "${current}")
+    cmpResult "${result}" world
+
+    endTest
+
+
+    #
+    # path
+    #
+    beginTest path
+
+    result=$(../shkv path "${current}")
+    cmpResult "${result}" "${SHKV_STORE}/${current}"
+
+    endTest
+
+
+    #
+    # del
+    #
+    beginTest del
+
+    setKey "${current}" world
+    ../shkv del "${current}"
+    [ -f "${SHKV_STORE}/${current}" ] && logFail || logSuccess
+
+    endTest
 }
 
-# testKey key testFilePath
-testKey () {
-    local key="$1"
-    local filePath="${SHKV_STORE}/${key}"
-    local testFilePath="./check/$2"
+serieAppend () {
+    #
+    # append from empty
+    #
+    beginTest append_from_empty
 
-    echo "testKey / key: ${key}, filePath=${filePath}"
-    cmpFile "${filePath}" "${testFilePath}"
+    ../shkv append "${current}" "append entry"
+    testKeyValue "append entry"
+
+    endTest
+
+
+    #
+    # append
+    #
+    beginTest append
+
+    setKey "${current}" world
+    ../shkv "${current}" append "append entry"
+    testKeyValue "worldappend entry"
+
+    endTest
+
+
+    #
+    # appendr from empty
+    #
+    beginTest appendr_from_empty
+
+    ../shkv appendr "${current}" "appendr entry"
+    testKeyFile ./check/appendrFromEmpty.txt
+
+    endTest
+
+
+    #
+    # appendr
+    #
+    beginTest appendr
+
+    setKey "${current}" world
+    ../shkv appendr "${current}" "appendr entry"
+    testKeyFile ./check/appendr.txt
+
+    endTest
 }
 
-# cmpFile result expected
-cmpFile () {
-    local result="$1"
-    local expected="$2"
+serieList () {
+    #
+    # add1
+    #
+    beginTest list_add1
 
-    echo "cmpFile / result: ${result}, expected=${expected}"
-    if diff -u "${result}" "${expected}"; then
-        echo "SUCCESS"
-    else
-        echo "FAIL"
-        anyFail="true"
-    fi
+    ../shkv list add "${current}" item1
+    testKeyFile ./check/listAdd1.txt
+
+    endTest
+
+
+    #
+    # add2
+    #
+    beginTest list_add2
+
+    setKey "${current}" item1
+    echo "" >> "${SHKV_STORE}/${current}"
+    ../shkv list add "${current}" item2
+    testKeyFile ./check/listAdd2.txt
+
+    endTest
+
+
+    #
+    # del
+    #
+    beginTest list_del
+    cat ./dataset/listDel.txt > "${SHKV_STORE}/${current}"
+
+    ../shkv list del "${current}" item2
+    testKeyFile ./check/listDel.txt
+    # item2item2 should not be destroyed by item2 del
+
+    endTest
+
+
+
+    #
+    # foreach
+    #
+    beginTest list_foreach
+    cat ./dataset/listForeach.txt > "${SHKV_STORE}/${current}"
+
+    ../shkv list foreach "${current}" listForeachCallback
+    cmpFile /tmp/shkv_foreach.txt ./check/foreach.txt
+
+    rm /tmp/shkv_foreach.txt 2> /dev/null
+    endTest
 }
 
-# cmpFile result expected
-cmpResult () {
-    local result="$1"
-    local expected="$1"
+serieDict () {
+    #
+    # set
+    #
+    beginTest dict_set
 
-    if [ "${result}" = "${expected}" ]; then
-        echo "SUCCESS"
-    else
-        echo "FAIL"
-        anyFail="true"
-    fi
+    ../shkv dict set "${current}" one oneword "comment of one"
+    ../shkv dict set "${current}" two twoword "comment of two"
+    testKeyFile ./check/dictSet.txt
+
+    endTest
+
+
+    #
+    # get
+    #
+    beginTest dict_get
+    cat ./dataset/dict.txt > "${SHKV_STORE}/${current}"
+
+    result=$(../shkv dict get "${current}" two)
+    cmpResult "${result}" twoword
+
+    endTest
+
+
+    #
+    # props
+    #
+    beginTest dict_props
+    cat ./dataset/dict.txt > "${SHKV_STORE}/${current}"
+
+    result=$(../shkv dict props "${current}")
+    cmpResult "${result}" "one=oneword two=twoword twotwo=twotwoword three=threeword"
+
+    endTest
+
+
+    #
+    # del
+    #
+    beginTest dict_del
+    cat ./dataset/dict.txt > "${SHKV_STORE}/${current}"
+
+    ../shkv dict del "${current}" two
+    testKeyFile ./check/dictDel.txt
+    # twotwo=twotwoword should not be destroyed by two del
+
+    endTest
 }
 
-# beginTest key
-beginTest () {
-    local key="$1"
 
-    echo ""
-    echo "----------"
-    echo "${key}"
-    echo "----------"
-    echo ""
-    rm "${SHKV_STORE}/${key}" 2> /dev/null
+#
+# BODY
+#
+main () {
+    serie
+    serieAppend
+    serieList
+    serieDict
+
+    report
 }
 
-# endTest key
-endTest () {
-    local key="$1"
-
-    echo ">"
-    cat "${SHKV_STORE}/${key}"
-    rm "${SHKV_STORE}/${key}" 2> /dev/null
-    echo "--"
-    echo ""
-}
-
-#
-# set
-#
-beginTest test_set
-
-echo ""
-echo "set 1"
-../shkv set test_set world
-testKey test_set set1.txt
-
-echo ""
-echo "set 2"
-../shkv set test_set "world test"
-testKey test_set set2.txt
-
-endTest test_set
-
-
-#
-# append from empy
-#
-beginTest test_append_from_empty
-
-../shkv append test_append_from_empty "append entry"
-testKey test_append_from_empty appendFromEmpty.txt
-
-endTest test_append_from_empty
-
-
-#
-# append
-#
-beginTest test_append
-
-setKey append world
-../shkv append append "append entry"
-testKey append append.txt
-
-endTest test_append
-
-
-#
-# appendr from empty
-#
-beginTest test_appendr_from_empty
-
-../shkv appendr test_appendr_from_empty "appendr entry"
-testKey test_appendr_from_empty appendrFromEmpty.txt
-
-endTest test_appendr_from_empty
-
-
-#
-# appendr
-#
-beginTest test_appendr
-
-echo ""
-echo "appendr"
-setKey test_appendr world
-../shkv appendr test_appendr "appendr entry"
-testKey test_appendr appendr.txt
-
-endTest test_appendr
-
-
-#
-# get
-#
-beginTest test_get
-
-setKey test_get world
-result=$(../shkv get test_get)
-cmpResult "${result}" world
-
-endTest test_get
-
-
-#
-# path
-#
-beginTest test_path
-
-result=$(../shkv path test_path)
-cmpResult "${result}" "${SHKV_STORE}/test_path"
-
-endTest test_path
-
-
-#
-# del
-#
-beginTest test_del
-
-setKey test_del world
-../shkv del test_del
-if [ ! -f "${SHKV_STORE}/test_del" ]; then
-    echo "SUCCESS"
-else
-    echo "FAIL"
-    anyFail="true"
-fi
-
-endTest test_del
-
-
-#
-# list add
-#
-beginTest test_list_add
-
-../shkv list add test_list_add item1
-testKey test_list_add listAdd1.txt
-../shkv list add test_list_add item2
-testKey test_list_add listAdd2.txt
-
-endTest test_list_add
-
-
-#
-# list del
-#
-beginTest test_list_del
-cat ./dataset/listDel.txt > "${SHKV_STORE}/test_list_del"
-
-../shkv list del test_list_del item2
-testKey test_list_del listDel.txt
-# item2item2 should not be destroyed by item2 del
-
-endTest test_list_del
-
-
-#
-# list foreach
-#
-callback1 () {
-    echo "callback1: $1"
-    echo "callback1: $1" >> /tmp/shkv_foreach.txt
-}
-export -f callback1
-
-beginTest test_list_foreach
-cat ./dataset/listForeach.txt > "${SHKV_STORE}/test_list_foreach"
-
-../shkv list foreach test_list_foreach callback1
-cmpFile /tmp/shkv_foreach.txt ./check/foreach.txt
-
-rm /tmp/shkv_foreach.txt 2> /dev/null
-endTest test_list_foreach
-
-
-#
-# dict set
-#
-beginTest test_dict_set
-
-../shkv dict set test_dict_set one oneword "comment of one"
-../shkv dict set test_dict_set two twoword "comment of two"
-testKey test_dict_set dictSet.txt
-
-endTest test_dict_set
-
-
-#
-# dict get
-#
-beginTest test_dict_get
-cat ./dataset/dict.txt > "${SHKV_STORE}/test_dict_get"
-
-result=$(../shkv dict get test_dict_get two)
-cmpResult "${result}" twoword
-
-endTest test_dict_get
-
-
-#
-# dict props
-#
-beginTest test_dict_props
-cat ./dataset/dict.txt > "${SHKV_STORE}/test_dict_props"
-
-result=$(../shkv dict props test_dict_props)
-cmpResult "${result}" "one=oneword two=twoword twotwo=twotwoword three=threeword"
-
-endTest test_dict_props
-
-
-#
-# dict del
-#
-beginTest test_dict_del
-cat ./dataset/dict.txt > "${SHKV_STORE}/test_dict_del"
-
-../shkv dict del test_dict_del two
-result=$(../shkv dict del test_dict_del two)
-testKey test_dict_del dictDel.txt
-
-endTest test_dict_del
-
-
-echo ""
-echo ""
-[ "${anyFail}" = "true" ] && echo "TEST FAILED" || echo "TEST SUCCESS"
+main
