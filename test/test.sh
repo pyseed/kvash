@@ -93,17 +93,21 @@ endTest test_set
 
 
 #
+# append from empy
+#
+beginTest test_append_from_empty
+
+../shkv append test_append_from_empty "append entry"
+testKey test_append_from_empty appendFromEmpty.txt
+
+endTest test_append_from_empty
+
+
+#
 # append
 #
 beginTest test_append
 
-echo ""
-echo "append from empty"
-../shkv append append "append entry"
-testKey append appendFromEmpty.txt
-
-echo ""
-echo "append"
 setKey append world
 ../shkv append append "append entry"
 testKey append append.txt
@@ -112,14 +116,20 @@ endTest test_append
 
 
 #
+# appendr from empty
+#
+beginTest test_appendr_from_empty
+
+../shkv appendr test_appendr_from_empty "appendr entry"
+testKey test_appendr_from_empty appendrFromEmpty.txt
+
+endTest test_appendr_from_empty
+
+
+#
 # appendr
 #
 beginTest test_appendr
-
-echo ""
-echo "appendr from empty"
-../shkv appendr test_appendr "appendr entry"
-testKey test_appendr appendrFromEmpty.txt
 
 echo ""
 echo "appendr"
