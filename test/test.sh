@@ -258,8 +258,8 @@ beginTest test_dict_del
 cat ./dataset/dict.txt > "${SHKV_STORE}/test_dict_del"
 
 ../shkv dict del test_dict_del two
-#result=$(../shkv dict del test_dict_del two)
-#testKey hello dictDel.txt
+result=$(../shkv dict del test_dict_del two)
+testKey test_dict_del dictDel.txt
 
 endTest test_dict_del
 

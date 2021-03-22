@@ -220,14 +220,13 @@ dict_del () {
     local key="$1"
     local prop="$2"
 
-    echo "grep test"
-    cat "${store}/${key}" | grep '^#'
-
     # IMPORTANT: match start word ^ to prevent from removing entries that are not exact (like ending by prop)
+    # IMPORTANT: target file can not be the source file, a pivot file is used
     # remove comment
-    cat "${store}/${key}" | (grep -v '# \\[two\\]' || cat "${store}/${key}") > "${store}/${key}"
+    cat "${store}/${key}" | (grep -v "^# \\[${prop}\\]" || cat "${store}/${key}") > "${store}/${key}.tmp"
     # remove value
-    cat "${store}/${key}" | (grep -v "^${prop}=" || cat "${store}/${key}") > "${store}/${key}"
+    cat "${store}/${key}.tmp" | (grep -v "^${prop}=" || cat "${store}/${key}") > "${store}/${key}"
+    rm "${store}/${key}.tmp"
 }
 
 
