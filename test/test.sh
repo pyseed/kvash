@@ -17,7 +17,7 @@ serie () {
     #
     beginTest set1
 
-    ../shkv set "${current}"
+    ../shkv set "${current}" world
     testKeyValue world
 
     endTest
