@@ -2,14 +2,60 @@
 export SHKV_STORE="${HOME}/tmp/shkv"
 #verbose=true
 
-# lib.sh.beginTest will set current test name in "${current}"
+# onBeforeSuite () {
+# }
+
+# onAfterSuite () {
+# }
+
+onBeforeIt () {
+    rm "${SHKV_STORE}/$1" 2> /dev/null
+}
+
+onAfterIt () {
+    rm "${SHKV_STORE}/$1" 2> /dev/null
+}
+
 . lib.sh
+
+
+# force key value
+# setKey key value
+setKey () {
+    local key="$1"
+    local value="$2"
+    local filePath="${SHKV_STORE}/${key}"
+
+    echo  -n "${value}" > "${filePath}"
+}
+
+# test key value, compare with file
+# testKey expectedContentFilePath
+testKeyFile () {
+    local expectedContentFilePath="$1"
+    local filePath="${SHKV_STORE}/${current}"
+
+    cmpFile "${filePath}" "${expectedContentFilePath}"
+}
+
+# test key value, compare witj value
+# testKeyValue expectedValue
+testKeyValue () {
+    local filePath="${SHKV_STORE}/${current}"
+    local tmpFile=$(getTmpFilePath)
+
+    echo  -n "$1" > "${tmpFile}"
+    cmpFile "${filePath}" "${tmpFile}"
+    rm "${tmpFile}"
+}
+
 
 listForeachCallback () {
     echo "listForeachCallback: $1"
     echo "listForeachCallback: $1" >> /tmp/shkv_foreach.txt
 }
 export -f listForeachCallback
+
 
 suiteGeneral () {
     suite "general"
