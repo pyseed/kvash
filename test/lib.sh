@@ -6,6 +6,9 @@ tmpFile=/tmp/shkv_tmp.txt
 anyFail=""
 currentSuite=""
 current=""
+totalCount=0
+successCount=0
+failCount=0
 lastResult=""
 lastExpected=""
 
@@ -13,21 +16,28 @@ rm "${reportFile}" 2> /dev/null
 
 # log a success
 logSuccess () {
-    display="[X] ${current}"
-    echo "${display}"
+    echo -e "\e[32mOK\e[0m ${currentSuite}.${current}"
+
+    ((successCount=successCount+1))
 }
 
 # log a fail
 logFail () {
     anyFail="true"
-    display="[ ] ${current}"
-    echo "${display}"
+    echo -e "\e[31mKO\e[0m ${currentSuite}.${current}"
+
+    ((failCount=failCount+1))
 }
 
 # report
 report () {
     echo ""
-    [ "${anyFail}" = "true" ] && echo "FAILS DETECTED" || echo "TEST SUCCESS"
+    echo "--"
+    # no fails: success in gree
+    [ ${failCount} != 0 ] && echo -e "success: ${successCount}" || echo -e "\e[32msuccess\e[0m: ${successCount}"
+    # any fail: fails in red
+    [ ${failCount} != 0 ] && echo -e "\e[31mfails\e[0m: ${failCount}"
+    echo -e "total: ${totalCount}"
     echo ""
 }
 
@@ -41,7 +51,6 @@ suite () {
 
     echo ""
     echo ""
-    echo "suite ${currentSuite}"
 }
 
 # a test is beginning
@@ -53,6 +62,8 @@ it () {
 
     current="$1"
     rm "${SHKV_STORE}/${current}" 2> /dev/null
+
+    ((totalCount=totalCount+1))
 }
 
 # a test has finished
@@ -128,8 +139,9 @@ cmpResult () {
 export -f logSuccess
 export -f logFail
 export -f report
-export -f beginTest
-export -f endTest
+export -f suite
+export -f it
+export -f itEnd
 export -f setKey
 export -f testKeyFile
 export -f testKeyValue
