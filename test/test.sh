@@ -10,7 +10,7 @@ onAfterIt () {
     rm "${SHKV_STORE}/$1" 2> /dev/null
 }
 
-curl https://raw.githubusercontent.com/pyseed/libash/master/test.sh > libash_test.sh
+wget -O libash_test.sh https://raw.githubusercontent.com/pyseed/libash/master/test.sh
 . ./libash_test.sh
 
 # force key value
@@ -33,9 +33,10 @@ assertKeyFile () {
 
 # assertKeyValue expectedValue
 assertKeyValue () {
+    local expectedValue="$1"
     local filePath="${SHKV_STORE}/${current}"
 
-    assertFileContent "${filePath}" "${testKeyValue}"
+    assertFileContent "${filePath}" "${expectedValue}"
 }
 
 
