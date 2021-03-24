@@ -4,6 +4,7 @@
 
 tmpFile=/tmp/shkv_tmp.txt
 anyFail=""
+currentSuite=""
 current=""
 lastResult=""
 lastExpected=""
@@ -30,21 +31,37 @@ report () {
     echo ""
 }
 
+# suite
+# suite name
+suite () {
+    # end previous test of previous suite
+    itEnd
+
+    currentSuite="$*"
+
+    echo ""
+    echo ""
+    echo "suite ${currentSuite}"
+}
+
 # a test is beginning
 # will set current test name in "${current}"
 # beginTest testName
-beginTest () {
+it () {
+    # end previous test
+    itEnd
+
     current="$1"
     rm "${SHKV_STORE}/${current}" 2> /dev/null
 }
 
 # a test has finished
 # endTest
-endTest () {
+itEnd () {
     [ "${verbose}" = "true" ] && [ -n "${lastResult}" ] && (echo "${lastResult}"; echo "->"; echo "${lastExpected}")
     echo ""
 
-    # rm "${SHKV_STORE}/${current}" 2> /dev/null
+    rm "${SHKV_STORE}/${current}" 2> /dev/null
 
     current=""
     lastResult=""
