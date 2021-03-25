@@ -14,6 +14,10 @@ HELP
 help:
 shkv help
 
+list keys:
+search: optional, is contained in key name
+shkv ls [search]
+
 set value:
 shkv set key value
 
@@ -70,6 +74,15 @@ checkArg () {
       echo "argument missing: $1"
       exit 1
    fi
+}
+
+#
+# shkv ls [search]
+#
+lsKeys () {
+    local search="$1"
+
+    [ -n "${search}" ] && ls -1 "${store}/${key}" | (grep "${search}" || echo "") || ls -1 "${store}/${key}"
 }
 
 #
@@ -215,12 +228,16 @@ dict () {
 }
 
 # set internal dict content without comments
+# dict_setRaw key targetKey
 dict_setRaw () {
    local key="$1"
+   local targetKey="$2"
+
    checkArg key "${key}"
+   checkArg targetKey "${key}"
 
    local source="${store}/${key}"
-   local target="${store}/${key}_"
+   local target="${store}/${targetKey}"
 
    cat "${source}" | (grep -v '^#' || cat "${source}") > "${target}"
 }
@@ -250,8 +267,10 @@ dict_get () {
     checkArg prop "${prop}"
 
     # extract then export as variable
-    dict_setRaw "${key}"
-    export $(get "${key}_" | (grep "^${prop}=" || echo ""))
+    dict_setRaw "${key}" ".${key}"
+    export $(get ".${key}" | (grep "^${prop}=" || echo ""))
+    del ".${key}"
+
     # get variable value
     echo "${!prop}"
 }
@@ -262,8 +281,9 @@ dict_props () {
 
     checkArg key "${key}"
 
-    dict_setRaw "${key}"
-    get "${key}_" | xargs
+    dict_setRaw "${key}" ".${key}"
+    get ".${key}" | xargs
+    del ".${key}"
 }
 
 
@@ -278,10 +298,10 @@ dict_del () {
     # IMPORTANT: match start word ^ to prevent from removing entries that are not exact (like ending by prop)
     # IMPORTANT: target file can not be the source file, a pivot file is used
     # remove comment
-    cat "${store}/${key}" | (grep -v "^# \\[${prop}\\]" || cat "${store}/${key}") > "${store}/${key}.tmp"
+    cat "${store}/${key}" | (grep -v "^# \\[${prop}\\]" || cat "${store}/${key}") > "${store}/.${key}"
     # remove value
-    cat "${store}/${key}.tmp" | (grep -v "^${prop}=" || cat "${store}/${key}") > "${store}/${key}"
-    rm "${store}/${key}.tmp"
+    cat "${store}/.${key}" | (grep -v "^${prop}=" || cat "${store}/${key}") > "${store}/${key}"
+    del ".${key}"
 }
 
 
@@ -299,6 +319,7 @@ main () {
 
     # command wrappers (when a command name is bash expression...)
     case "${command}" in
+        ls) commandFunctionName="lsKeys";;
         set) commandFunctionName="setVal";;
     esac
 

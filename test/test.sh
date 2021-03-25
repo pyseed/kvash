@@ -60,7 +60,7 @@ suiteGeneral () {
 
     # ls search
     it ls_search
-    ../shkv ls > "${tmpFile}" one
+    ../shkv ls one > "${tmpFile}"
     assertFileContent "${tmpFile}" one
     rm "${SHKV_STORE}/one"
     rm "${SHKV_STORE}/two"
