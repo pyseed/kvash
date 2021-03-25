@@ -50,6 +50,22 @@ export -f listForeachCallback
 suiteGeneral () {
     suite "general"
 
+    # ls
+    it ls
+    local tmpFile=$(fixtureTmpFilePath)
+    setKey one oneval
+    setKey two twoval
+    ../shkv ls > "${tmpFile}"
+    assertFile "${tmpFile}" ./check/ls.txt
+
+    # ls search
+    it ls_search
+    ../shkv ls > "${tmpFile}" one
+    assertFileContent "${tmpFile}" one
+    rm "${SHKV_STORE}/one"
+    rm "${SHKV_STORE}/two"
+    rm "${tmpFile}"
+
     # set1
     it set1
     ../shkv set "${current}" world
