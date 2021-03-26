@@ -1,6 +1,6 @@
 #!/bin/bash
-project="shkv"
-version="0.0.1"
+project="kvash"
+version="0.9.0"
 
 errorBanner="$(cat <<-EOF
 error during command or command not found.
@@ -14,8 +14,8 @@ ${project} ${version}
 HELP
 ----
 
-location of your store (main directory path) should be set in SHKV_STORE var env
-example: export SHKV_STORE="\${HOME}/kvstore/store1"
+location of your store (main directory path) should be set in KVASH_STORE var env
+example: export KVASH_STORE="\${HOME}/kvstore/store1"
 
 SCOPE
 -----
@@ -35,7 +35,7 @@ TYPES
 COMMANDS
 --------
 
-there is no explicit ${project} "clear" command, please use rm "\${SHKV_STORE}/*" to delete all the store (all the keys) 
+there is no explicit ${project} "clear" command, please use rm "\${KVASH_STORE}/*" to delete all the store (all the keys) 
 
 help:
 ${project} help
@@ -364,10 +364,10 @@ dict_del () {
 #
 main () {
 [ -z ${command} ] && command="help"
-    store=${SHKV_STORE}
+    store=${KVASH_STORE}
 
     if [ "${command}" != "help" ] && [ -z "${store}" ]; then
-        echo "aborted. target store absolute path should be pointed with SHKV_STORE environment variable"
+        echo "aborted. target store absolute path should be pointed with KVASH_STORE environment variable"
         exit
     fi
 
@@ -385,7 +385,7 @@ main () {
 
 command="$1"
 commandFunctionName="$1"
-store=${SHKV_STORE}
+store=${KVASH_STORE}
 cwd=$(pwd)
 
 main ${@:2}

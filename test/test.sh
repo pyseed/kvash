@@ -1,13 +1,14 @@
 #!/bin/bash
-export SHKV_STORE="${HOME}/tmp/shkv"
+project="kvash"
+export KVASH_STORE="${HOME}/tmp/kvash"
 #verbose=true
 
 onBeforeIt () {
-    rm "${SHKV_STORE}/$1" 2> /dev/null
+    rm "${KVASH_STORE}/$1" 2> /dev/null
 }
 
 onAfterIt () {
-    rm "${SHKV_STORE}/$1" 2> /dev/null
+    rm "${KVASH_STORE}/$1" 2> /dev/null
 }
 
 wget -O libash_test.sh https://raw.githubusercontent.com/pyseed/libash/master/test.sh
@@ -18,7 +19,7 @@ wget -O libash_test.sh https://raw.githubusercontent.com/pyseed/libash/master/te
 setKey () {
     local key="$1"
     local value="$2"
-    local filePath="${SHKV_STORE}/${key}"
+    local filePath="${KVASH_STORE}/${key}"
 
     echo  -n "${value}" > "${filePath}"
 }
@@ -26,7 +27,7 @@ setKey () {
 # assertKeyFile expectedContentFilePath
 assertKeyFile () {
     local expectedContentFilePath="$1"
-    local filePath="${SHKV_STORE}/${current}"
+    local filePath="${KVASH_STORE}/${current}"
 
     assertFile "${filePath}" "${expectedContentFilePath}"
 }
@@ -34,7 +35,7 @@ assertKeyFile () {
 # assertKeyValue expectedValue
 assertKeyValue () {
     local expectedValue="$1"
-    local filePath="${SHKV_STORE}/${current}"
+    local filePath="${KVASH_STORE}/${current}"
 
     assertFileContent "${filePath}" "${expectedValue}"
 }
@@ -42,7 +43,7 @@ assertKeyValue () {
 
 listForeachCallback () {
     echo "listForeachCallback: $1"
-    echo "listForeachCallback: $1" >> /tmp/shkv_foreach.txt
+    echo "listForeachCallback: $1" >> /tmp/${project}_foreach.txt
 }
 export -f listForeachCallback
 
@@ -57,67 +58,67 @@ suiteGeneral () {
     tmpFile=$(fixtureTmpFilePath)
     setKey one oneval
     setKey two twoval
-    ../shkv ls > "${tmpFile}"
+    ../${project} ls > "${tmpFile}"
     assertFile "${tmpFile}" ./check/ls.txt
     rm "${tmpFile}"
 
     # ls search
     it ls_search
     tmpFile=$(fixtureTmpFilePath)
-    ../shkv ls one > "${tmpFile}"
+    ../${project} ls one > "${tmpFile}"
     assertFile "${tmpFile}" ./check/ls_search.txt
-    rm "${SHKV_STORE}/one"
-    rm "${SHKV_STORE}/two"
+    rm "${KVASH_STORE}/one"
+    rm "${KVASH_STORE}/two"
     rm "${tmpFile}"
 
     # touch
     it touch
-    ../shkv touch "${current}"
-    assertIsFile "${SHKV_STORE}/${current}"
+    ../${project} touch "${current}"
+    assertIsFile "${KVASH_STORE}/${current}"
 
     # touch (file exist)
     it touch_exist
     setKey "${current}" world
-    ../shkv touch "${current}"
+    ../${project} touch "${current}"
     assertKeyValue world
 
     # has not
     it has_not
-    result=$(../shkv has "${current}")
+    result=$(../${project} has "${current}")
     assertResult "${result}" "false"
 
     # has
     it has
     setKey "${current}" world
-    result=$(../shkv has "${current}")
+    result=$(../${project} has "${current}")
     assertResult "${result}" "true"
 
     # set1
     it set1
-    ../shkv set "${current}" world
+    ../${project} set "${current}" world
     assertKeyValue world
 
     # set2
     it set2
-    ../shkv set "${current}" "world test"
+    ../${project} set "${current}" "world test"
     assertKeyValue "world test"
 
     # get
     it get
     setKey "${current}" world
-    result=$(../shkv get "${current}")
+    result=$(../${project} get "${current}")
     assertResult "${result}" world
 
     # path
     it path
-    result=$(../shkv path "${current}")
-    assertResult "${result}" "${SHKV_STORE}/${current}"
+    result=$(../${project} path "${current}")
+    assertResult "${result}" "${KVASH_STORE}/${current}"
 
     # del
     it del
     setKey "${current}" world
-    ../shkv del "${current}"
-    assertIsNotFile "${SHKV_STORE}/${current}"
+    ../${project} del "${current}"
+    assertIsNotFile "${KVASH_STORE}/${current}"
 }
 
 suiteAppend () {
@@ -125,55 +126,58 @@ suiteAppend () {
 
     # append from empty
     it append_from_empty
-    ../shkv append "${current}" "append entry"
+    ../${project} append "${current}" "append entry"
     assertKeyValue "append entry"
 
     # append
     it append
     setKey "${current}" world
-    ../shkv "${current}" append "append entry"
+    ../${project} "${current}" append "append entry"
     assertKeyValue "worldappend entry"
 
     # appendr from empty
     it appendr_from_empty
-    ../shkv appendr "${current}" "appendr entry"
+    ../${project} appendr "${current}" "appendr entry"
     assertKeyFile ./check/appendrFromEmpty.txt
 
     # appendr
     it appendr
     setKey "${current}" world
-    ../shkv appendr "${current}" "appendr entry"
+    ../${project} appendr "${current}" "appendr entry"
     assertKeyFile ./check/appendr.txt
 }
 
 suiteList () {
+    local tmpFile
+
     suite "list"
 
     # add1
     it list_add1
-    ../shkv list add "${current}" item1
+    ../${project} list add "${current}" item1
     assertKeyFile ./check/listAdd1.txt
 
     # add2
     it list_add2
     setKey "${current}" item1
-    echo "" >> "${SHKV_STORE}/${current}"
-    ../shkv list add "${current}" item2
+    echo "" >> "${KVASH_STORE}/${current}"
+    ../${project} list add "${current}" item2
     assertKeyFile ./check/listAdd2.txt
 
     # del
     it list_del
-    cat ./dataset/listDel.txt > "${SHKV_STORE}/${current}"
-    ../shkv list del "${current}" item2
+    cat ./dataset/listDel.txt > "${KVASH_STORE}/${current}"
+    ../${project} list del "${current}" item2
     assertKeyFile ./check/listDel.txt
     # item2item2 should not be destroyed by item2 del
 
     # foreach
     it list_foreach
-    cat ./dataset/listForeach.txt > "${SHKV_STORE}/${current}"
-    ../shkv list foreach "${current}" listForeachCallback
-    assertFile /tmp/shkv_foreach.txt ./check/foreach.txt
-    rm /tmp/shkv_foreach.txt 2> /dev/null
+    tmpFile=$(fixtureTmpFilePath)
+    cat ./dataset/listForeach.txt > "${KVASH_STORE}/${current}"
+    ../${project} list foreach "${current}" listForeachCallback > "${tmpFile}"
+    assertFile "${tmpFile}" ./check/foreach.txt
+    rm "${tmpFile}"
 }
 
 suiteDict () {
@@ -181,26 +185,26 @@ suiteDict () {
 
     # set
     it dict_set
-    ../shkv dict set "${current}" one oneword "comment of one"
-    ../shkv dict set "${current}" two twoword "comment of two"
+    ../${project} dict set "${current}" one oneword "comment of one"
+    ../${project} dict set "${current}" two twoword "comment of two"
     assertKeyFile ./check/dictSet.txt
 
     # get
     it dict_get
-    cat ./dataset/dict.txt > "${SHKV_STORE}/${current}"
-    result=$(../shkv dict get "${current}" two)
+    cat ./dataset/dict.txt > "${KVASH_STORE}/${current}"
+    result=$(../${project} dict get "${current}" two)
     assertResult "${result}" twoword
 
     # props
     it dict_props
-    cat ./dataset/dict.txt > "${SHKV_STORE}/${current}"
-    result=$(../shkv dict props "${current}")
+    cat ./dataset/dict.txt > "${KVASH_STORE}/${current}"
+    result=$(../${project} dict props "${current}")
     assertResult "${result}" "one=oneword two=twoword twotwo=twotwoword three=threeword"
 
     # del
     it dict_del
-    cat ./dataset/dict.txt > "${SHKV_STORE}/${current}"
-    ../shkv dict del "${current}" two
+    cat ./dataset/dict.txt > "${KVASH_STORE}/${current}"
+    ../${project} dict del "${current}" two
     assertKeyFile ./check/dictDel.txt
     # twotwo=twotwoword should not be destroyed by two del
 }
