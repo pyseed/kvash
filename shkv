@@ -18,6 +18,10 @@ list keys:
 search: optional, is contained in key name
 shkv ls [search]
 
+touch a key
+(will not erase content if exist)
+shkv touch key
+
 set value:
 shkv set key value
 
@@ -83,6 +87,17 @@ lsKeys () {
     local search="$1"
 
     [ -n "${search}" ] && ls -1 "${store}/${key}" | (grep "${search}" || echo "") || ls -1 "${store}/${key}"
+}
+
+#
+# touch key
+#
+touchKey () {
+    local key="$1"
+
+    checkArg key "${key}"
+
+    touch "${store}/${key}"
 }
 
 #
@@ -320,6 +335,7 @@ main () {
     # command wrappers (when a command name is bash expression...)
     case "${command}" in
         ls) commandFunctionName="lsKeys";;
+        touch)  commandFunctionName="touchKey";;
         set) commandFunctionName="setVal";;
     esac
 

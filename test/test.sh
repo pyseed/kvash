@@ -48,23 +48,38 @@ export -f listForeachCallback
 
 
 suiteGeneral () {
+    local tmpFile
+
     suite "general"
 
     # ls
     it ls
-    local tmpFile=$(fixtureTmpFilePath)
+    tmpFile=$(fixtureTmpFilePath)
     setKey one oneval
     setKey two twoval
     ../shkv ls > "${tmpFile}"
     assertFile "${tmpFile}" ./check/ls.txt
+    rm "${tmpFile}"
 
     # ls search
     it ls_search
+    tmpFile=$(fixtureTmpFilePath)
     ../shkv ls one > "${tmpFile}"
     assertFileContent "${tmpFile}" one
     rm "${SHKV_STORE}/one"
     rm "${SHKV_STORE}/two"
     rm "${tmpFile}"
+
+    # touch
+    it touch
+    ../shkv touch "${current}"
+    assertIsFile "${SHKV_STORE}/${current}"
+
+    # touch (file exist)
+    it touch
+    setKey "${current}" world
+    ../shkv touch "${current}"
+    assertKeyValue world
 
     # set1
     it set1
