@@ -1,6 +1,6 @@
 # kvash
 
-lite file based key value for storing state in bash
+lite file based key value store in bash
 
 ## scope
 
@@ -17,10 +17,10 @@ lite file based key value for storing state in bash
 
 ## commands
 
-location of your store (main directory path) should be set in KVASH_STORE var env:
+location of your store (main directory path) should be set in KVASH_STORE environment variable:
 
 ```bash
-export KVASH_STORE="\${HOME}/kvstore/store1"
+export KVASH_STORE="${HOME}/kvstore/store1"
 ```
 
 there is no explicit "clear" command, please use `rm "${KVASH_STORE}/*"` to delete all the store (all the keys) 
@@ -33,12 +33,12 @@ kvash ls [search]
 kvash ls
 > foo
 > bar
+> foobar
 ```
 
 ```bash
 kvash ls foo
 > foo
-> bar
 > foobar
 ```
 
@@ -54,7 +54,7 @@ kvash touch key
 
 will not erase content if exists
 
-### set raw value (and string)
+### set value (and string)
 
 kvash set key value
 
@@ -123,7 +123,7 @@ kvash dict get key prop
 kvash dict get key prop
 > propValue
 
-export prop=\$(kvash dict get key prop)
+export prop=$(kvash dict get key prop)
 ```
 
 ### dict - get props as args
@@ -134,7 +134,7 @@ kvash dict props key
 kvash dict props key
 > foo=Foo bar=Bar
 
-export \$(kvash dict props key)
+export $(kvash dict props key)
 ```
 
 ### dict - del prop
