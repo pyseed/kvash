@@ -65,7 +65,7 @@ suiteGeneral () {
     it ls_search
     tmpFile=$(fixtureTmpFilePath)
     ../shkv ls one > "${tmpFile}"
-    assertFileContent "${tmpFile}" one
+    assertFile "${tmpFile}" ./check/ls_search.txt
     rm "${SHKV_STORE}/one"
     rm "${SHKV_STORE}/two"
     rm "${tmpFile}"
