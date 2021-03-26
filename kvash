@@ -14,9 +14,6 @@ ${project} ${version}
 HELP
 ----
 
-location of your store (main directory path) should be set in KVASH_STORE var env
-example: export KVASH_STORE="\${HOME}/kvstore/store1"
-
 SCOPE
 -----
 
@@ -34,6 +31,9 @@ TYPES
 
 COMMANDS
 --------
+
+location of your store (main directory path) should be set in KVASH_STORE var env
+example: export KVASH_STORE="\${HOME}/kvstore/store1"
 
 there is no explicit ${project} "clear" command, please use rm "\${KVASH_STORE}/*" to delete all the store (all the keys) 
 
@@ -73,7 +73,7 @@ no duplicates expected in your use case ? before list add you can always call li
 
 list foreach key callback:
 export -f callback
-${project} list foreach callback
+${project} list foreach key callback
 item is passed as \$1 in callback
 
 dict set prop:
