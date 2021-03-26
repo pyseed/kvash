@@ -2,6 +2,13 @@
 
 lite file based key value store in bash
 
+## getting started
+
+```
+wget -O libash_test.sh https://raw.githubusercontent.com/pyseed/kvash/master/kvash.sh
+./kvash help
+```
+
 ## scope
 
 - each key is a file, so do not use this tool as a massive storage (you do not want millions of ionodes isn't it ?)
@@ -140,3 +147,12 @@ export $(kvash dict props key)
 ### dict - del prop
 
 kvash dict del key prop
+
+## development
+
+### unit test
+
+```
+cd test
+./test.sh
+```
