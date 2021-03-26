@@ -76,10 +76,21 @@ suiteGeneral () {
     assertIsFile "${SHKV_STORE}/${current}"
 
     # touch (file exist)
-    it touch
+    it touch_exist
     setKey "${current}" world
     ../shkv touch "${current}"
     assertKeyValue world
+
+    # has not
+    it has_not
+    result=$(../shkv has "${current}")
+    assertResult "${result}" "false"
+
+    # has
+    it has
+    setKey "${current}" world
+    result=$(../shkv has "${current}")
+    assertResult "${result}" "true"
 
     # set1
     it set1
