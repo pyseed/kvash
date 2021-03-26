@@ -5,13 +5,14 @@ lite file based key value store in bash
 ## getting started
 
 ```
-wget -O libash_test.sh https://raw.githubusercontent.com/pyseed/kvash/master/kvash.sh
+wget -O kvash https://raw.githubusercontent.com/pyseed/kvash/master/kvash
+chmod u+x ./kvash
 ./kvash help
 ```
 
 ## scope
 
-- each key is a file, so do not use this tool as a massive storage (you do not want millions of ionodes isn't it ?)
+- each key is a file, so do not use this tool as a massive storage (you do not want millions of inodes isn't it ?)
 - the goal is not to replace or mimic a 'true' key value storage
 - the goal is to store embedded state when a 'true' key value storage seems overkill
 - this tool helps to have list and dict types for your states in bash
