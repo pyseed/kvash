@@ -171,10 +171,16 @@ suiteList () {
     assertKeyFile ./check/listAdd2.txt
 
     # del
-    it list_del
+    it list_del_single
+    setKey "${current}" item
+    ../${project} list del "${current}" item
+    assertKeyFile ./check/listDelSingle.txt
+
+    # del dataset n itms items
+    it list_del_items
     cat ./dataset/listDel.txt > "${KVASH_STORE}/${current}"
     ../${project} list del "${current}" item2
-    assertKeyFile ./check/listDel.txt
+    assertKeyFile ./check/listDelItems.txt
     # item2item2 should not be destroyed by item2 del
 
     # foreach
@@ -214,10 +220,16 @@ suiteDict () {
     assertResult "${result}" "one=oneword two=twoword twotwo=twotwoword three=threeword"
 
     # del
-    it dict_del
+    it dict_del_single
+    setKey "${current}" "hello=world"
+    ../${project} dict del "${current}" hello
+    assertKeyFile ./check/dictDelSingle.txt
+
+    # del with n items dataset
+    it dict_del_items
     cat ./dataset/dict.txt > "${KVASH_STORE}/${current}"
     ../${project} dict del "${current}" two
-    assertKeyFile ./check/dictDel.txt
+    assertKeyFile ./check/dictDelItems.txt
     # twotwo=twotwoword should not be destroyed by two del
 
     # foreach
