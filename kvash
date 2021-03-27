@@ -363,7 +363,7 @@ dict_del () {
 # BODY
 #
 main () {
-[ -z ${command} ] && command="help"
+    [ -z ${command} ] && command="help"
     store=${KVASH_STORE}
 
     if [ "${command}" != "help" ] && [ -z "${store}" ]; then
