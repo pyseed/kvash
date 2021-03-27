@@ -260,7 +260,8 @@ handler_list_del () {
     mv -f "${store}/${key}.tmp" "${store}/${key}"
 }
 
-# list for key func
+# list foreach key callback
+# item will be $1 in callback
 handler_list_foreach () {
     local key="$1"
     local callback="$2"
@@ -331,7 +332,7 @@ handler_dict_get () {
     echo "${!prop}"
 }
 
-# dict get key prop
+# dict get key props
 handler_dict_props () {
     local key="$1"
 
@@ -342,6 +343,24 @@ handler_dict_props () {
     handler_del ".${key}"
 }
 
+# dict foreach key callback
+# prop will be $1 in callback, its value $2
+handler_dict_foreach () {
+    local key="$1"
+    local callback="$2"
+
+    checkArg key "${key}"
+    checkArg callback "${callback}"
+
+    dict_setRaw "${key}" ".${key}"
+
+    while read item; do
+        IFS='=' read -r -a array <<< "$item"
+        "${callback}" "${array[0]}" "${array[1]}"
+    done < "${store}/.${key}"
+
+    handler_del ".${key}"
+}
 
 # dict del key prop
 handler_dict_del () {

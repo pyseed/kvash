@@ -145,6 +145,21 @@ kvash dict props key
 export $(kvash dict props key)
 ```
 
+#### dict - foreach
+
+kvash dict foreach key callback
+
+prop will be $1 in callback, its value in $2
+
+```bash
+callback () {
+  echo "from callback, prop: $1, value: $2"
+}
+export -f callback
+
+kvash dict foreach key callback
+```
+
 ### dict - del prop
 
 kvash dict del key prop

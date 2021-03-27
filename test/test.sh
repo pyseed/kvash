@@ -43,9 +43,15 @@ assertKeyValue () {
 
 listForeachCallback () {
     echo "listForeachCallback: $1"
-    echo "listForeachCallback: $1" >> /tmp/${project}_foreach.txt
+    echo "listForeachCallback: $1" >> /tmp/${project}_listForeach.txt
 }
 export -f listForeachCallback
+
+dictForeachCallback () {
+    echo "dictForeachCallback: $1 $2"
+    echo "dictForeachCallback: $1 $2" >> /tmp/${project}_dictForeach.txt
+}
+export -f dictForeachCallback
 
 
 suiteGeneral () {
@@ -173,11 +179,11 @@ suiteList () {
 
     # foreach
     it list_foreach
-    tmpFile=$(fixtureTmpFilePath)
-    cat ./dataset/listForeach.txt > "${KVASH_STORE}/${current}"
-    ../${project} list foreach "${current}" listForeachCallback > "${tmpFile}"
-    assertFile "${tmpFile}" ./check/foreach.txt
-    rm "${tmpFile}"
+    cat ./dataset/list.txt > "${KVASH_STORE}/${current}"
+    rm "/tmp/${project}_listForeach.txt" 2> /dev/null
+    ../${project} list foreach "${current}" listForeachCallback
+    assertFile "/tmp/${project}_listForeach.txt" ./check/listForeach.txt
+    rm "/tmp/${project}_listForeach.txt"
 }
 
 suiteDict () {
@@ -213,6 +219,14 @@ suiteDict () {
     ../${project} dict del "${current}" two
     assertKeyFile ./check/dictDel.txt
     # twotwo=twotwoword should not be destroyed by two del
+
+    # foreach
+    it dict_foreach
+    cat ./dataset/dict.txt > "${KVASH_STORE}/${current}"
+    rm "/tmp/${project}_dictForeach.txt" 2> /dev/null
+    ../${project} dict foreach "${current}" dictForeachCallback
+    assertFile "/tmp/${project}_dictForeach.txt" ./check/dictForeach.txt
+    rm "/tmp/${project}_dictForeach.txt"
 }
 
 
