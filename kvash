@@ -299,7 +299,7 @@ dict_setRaw () {
    cat "${source}" | (grep -v '^#' || cat "${source}") > "${target}"
 }
 
-# dict set key prop value comment
+# dict set key prop value [comment]
 handler_dict_set () {
     local key="$1"
     local prop="$2"
@@ -309,9 +309,8 @@ handler_dict_set () {
     checkArg key "${key}"
     checkArg prop "${prop}"
     checkArg value "${value}"
-    checkArg comment "${comment}"
 
-    handler_list_add "${key}" "# [${prop}] $comment"
+    [[ -n "${comment}" ]] && handler_list_add "${key}" "# [${prop}] $comment"
     handler_list_add "${key}" "${prop}=${value}"
 }
 

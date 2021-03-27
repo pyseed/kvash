@@ -185,9 +185,15 @@ suiteDict () {
 
     # set
     it dict_set
+    ../${project} dict set "${current}" one oneword
+    ../${project} dict set "${current}" two twoword
+    assertKeyFile ./check/dictSet.txt
+
+    # set
+    it dict_set_comment
     ../${project} dict set "${current}" one oneword "comment of one"
     ../${project} dict set "${current}" two twoword "comment of two"
-    assertKeyFile ./check/dictSet.txt
+    assertKeyFile ./check/dictSetComment.txt
 
     # get
     it dict_get
