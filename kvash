@@ -220,7 +220,7 @@ handler_del () {
 
     checkArg key "${key}"
 
-    rm "${store}/${key}"
+    rm "${store}/${key}" 2> /dev/null
 }
 
 
