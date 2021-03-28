@@ -1,15 +1,15 @@
 #!/bin/bash
-project="kvash"
+program="kvash"
 version="0.9.0"
 
 errorBanner="$(cat <<-EOF
 error during command or command not found.
-type ${project} help for help."
+type ${program} help for help."
 EOF
 )"
 
 helpMessage="$(cat <<-EOF
-${project} ${version}
+${program} ${version}
 
 HELP
 ----
@@ -35,60 +35,60 @@ COMMANDS
 location of your store (main directory path) should be set in KVASH_STORE var env
 example: export KVASH_STORE="\${HOME}/kvstore/store1"
 
-there is no explicit ${project} "clear" command, please use rm "\${KVASH_STORE}/*" to delete all the store (all the keys) 
+there is no explicit ${program} "clear" command, please use rm "\${KVASH_STORE}/*" to delete all the store (all the keys) 
 
 help:
-${project} help
+${program} help
 
 list keys:
-${project} ls [search]
+${program} ls [search]
 
 touch a key
-${project} touch key
+${program} touch key
 will not erase content if exists
 
 set value:
-${project} set key value
+${program} set key value
 
 append:
-${project} append key value
+${program} append key value
 please do not add content to a list/dict key until you know what you do
 
 append with crlf after value:
-${project} appendr key value
+${program} appendr key value
 please do not add content to a list/dict key until you know what you do
 
 get key file full path:
-${project} path key
+${program} path key
 
 remove key:
-${project} del key
+${program} del key
 
 list add item:
-${project} list add key item
+${program} list add key item
 
 list del item:
-${project} list del key
+${program} list del key
 no duplicates expected in your use case ? before list add you can always call list del
 
 list foreach key callback:
 export -f callback
-${project} list foreach key callback
+${program} list foreach key callback
 item is passed as \$1 in callback
 
 dict set prop:
-${project} dict set key prop value comment
+${program} dict set key prop value comment
 
 dict get prop:
-${project} dict get key prop
-export prop=\$(${project} dict get key prop)
+${program} dict get key prop
+export prop=\$(${program} dict get key prop)
 
 dict get props as args:
-${project} dict props key
-export \$(${project} dict props key)
+${program} dict props key
+export \$(${program} dict props key)
 
 dict del prop:
-${project} dict del key prop
+${program} dict del key prop
 
 EOF
 )"
