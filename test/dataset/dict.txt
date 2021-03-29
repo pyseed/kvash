@@ -1,8 +1,4 @@
-# [one] comment of one
 one=oneword
-# [two] comment of two
 two=twoword
-# [twotwo] comment of twotwo
 twotwo=twotwoword
-# [three] comment of three
 three=threeword

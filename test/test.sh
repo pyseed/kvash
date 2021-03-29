@@ -197,15 +197,12 @@ suiteDict () {
 
     # set
     it dict_set
+    ../${program} dict set "${current}" one oneone
+    ../${program} dict set "${current}" two twotwo
     ../${program} dict set "${current}" one oneword
     ../${program} dict set "${current}" two twoword
     assertKeyFile ./check/dictSet.txt
-
-    # set
-    it dict_set_comment
-    ../${program} dict set "${current}" one oneword "comment of one"
-    ../${program} dict set "${current}" two twoword "comment of two"
-    assertKeyFile ./check/dictSetComment.txt
+    # oneword and twoword should erase oneone twotwo
 
     # get
     it dict_get

@@ -286,34 +286,20 @@ handler_dict () {
     declare -F "handler_dict_${dictCommandFunctionName}" &> /dev/null && "handler_dict_${dictCommandFunctionName}" ${@:2} || echo "${errorBanner}"
 }
 
-# set internal dict content without comments
-# dict_setRaw key targetKey
-dict_setRaw () {
-   local key="$1"
-   local targetKey="$2"
-
-   checkArg key "${key}"
-   checkArg targetKey "${key}"
-
-   local source="${store}/${key}"
-   local target="${store}/${targetKey}"
-
-   cat "${source}" | (grep -v '^#' || cat "${source}") > "${target}"
-}
-
-# dict set key prop value [comment]
+# dict set key prop value
 handler_dict_set () {
     local key="$1"
     local prop="$2"
-    local value="$3"
-    local comment="${*:4}"
+    local value="${*:3}"
 
     checkArg key "${key}"
     checkArg prop "${prop}"
     checkArg value "${value}"
 
-    [[ -n "${comment}" ]] && handler_list_add "${key}" "# [${prop}] $comment"
+    handler_touch "${key}"
+    handler_dict_del "${key}" "${prop}"
     handler_list_add "${key}" "${prop}=${value}"
+    cat "${store}/${key}"
 }
 
 # dict get key prop
@@ -324,12 +310,7 @@ handler_dict_get () {
     checkArg key "${key}"
     checkArg prop "${prop}"
 
-    # extract then export as variable
-    dict_setRaw "${key}" ".${key}"
-    export $(handler_get ".${key}" | (grep "^${prop}=" || echo ""))
-    handler_del ".${key}"
-
-    # get variable value
+    export $(handler_get "${key}" | (grep "^${prop}=" || echo ""))
     echo "${!prop}"
 }
 
@@ -339,9 +320,7 @@ handler_dict_props () {
 
     checkArg key "${key}"
 
-    dict_setRaw "${key}" ".${key}"
-    handler_get ".${key}" | xargs
-    handler_del ".${key}"
+    handler_get "${key}" | xargs
 }
 
 # dict foreach key callback
@@ -353,14 +332,10 @@ handler_dict_foreach () {
     checkArg key "${key}"
     checkArg callback "${callback}"
 
-    dict_setRaw "${key}" ".${key}"
-
     while read item; do
         IFS='=' read -r -a array <<< "$item"
         "${callback}" "${array[0]}" "${array[1]}"
-    done < "${store}/.${key}"
-
-    handler_del ".${key}"
+    done < "${store}/${key}"
 }
 
 # dict del key prop
@@ -373,11 +348,8 @@ handler_dict_del () {
 
     # IMPORTANT: match start word ^ to prevent from removing entries that are not exact (like ending by prop)
     # IMPORTANT: target file can not be the source file, a pivot file is used
-    # remove comment
-    cat "${store}/${key}" | (grep -v "^# \\[${prop}\\]" || cat "${store}/${key}") > "${store}/.${key}"
-    # remove value
-    cat "${store}/.${key}" | (grep -v "^${prop}=" || cat "${store}/${key}") > "${store}/${key}"
-    handler_del ".${key}"
+    cat "${store}/${key}" | (grep -v "^${prop}=" || echo "") > "${store}/.${key}"
+    sed '/^$/d' "${store}/.${key}" > "${store}/${key}" # remove empty lines
 }
 
 

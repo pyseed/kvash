@@ -1,4 +1,0 @@
-# [one] comment of one
-one=oneword
-# [two] comment of two
-two=twoword
