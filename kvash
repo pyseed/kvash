@@ -270,7 +270,12 @@ handler_list_foreach () {
     checkArg key "${key}"
     checkArg callback "${callback}"
 
-    while read item; do "${callback}" "${item}"; done < "${store}/${key}"
+    # remove empty lines
+    sed '/^$/d' "${store}/${key}" > "${store}/${key}.tmp"
+
+    while read item; do "${callback}" "${item}"; done < "${store}/${key}.tmp"
+
+    rm "${store}/${key}.tmp"
 }
 
 
@@ -332,10 +337,15 @@ handler_dict_foreach () {
     checkArg key "${key}"
     checkArg callback "${callback}"
 
+    # remove empty lines
+    sed '/^$/d' "${store}/${key}" > "${store}/${key}.tmp"
+
     while read item; do
         IFS='=' read -r -a array <<< "$item"
         "${callback}" "${array[0]}" "${array[1]}"
-    done < "${store}/${key}"
+    done < "${store}/${key}.tmp"
+
+    rm "${store}/${key}.tmp"
 }
 
 # dict del key prop
