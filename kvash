@@ -304,7 +304,6 @@ handler_dict_set () {
     handler_touch "${key}"
     handler_dict_del "${key}" "${prop}"
     handler_list_add "${key}" "${prop}=${value}"
-    cat "${store}/${key}"
 }
 
 # dict get key prop
