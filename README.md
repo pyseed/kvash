@@ -119,6 +119,14 @@ export -f callback
 kvash list foreach key callback
 ```
 
+### list - sforeach
+
+same as foreach but items are sorted
+
+```
+kvash list sforeach key callback
+```
+
 ### dict - set prop
 
 kvash dict set key prop value [comment]

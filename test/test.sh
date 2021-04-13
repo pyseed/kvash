@@ -190,6 +190,14 @@ suiteList () {
     ../${program} list foreach "${current}" listForeachCallback
     assertFile "/tmp/${program}_listForeach.txt" ./check/listForeach.txt
     rm "/tmp/${program}_listForeach.txt"
+
+    # sorted foreach
+    it list_sforeach
+    cat ./dataset/list.txt > "${KVASH_STORE}/${current}"
+    rm "/tmp/${program}_listForeach.txt" 2> /dev/null
+    ../${program} list sforeach "${current}" listForeachCallback
+    assertFile "/tmp/${program}_listForeach.txt" ./check/listForeachSorted.txt
+    rm "/tmp/${program}_listForeach.txt"
 }
 
 suiteDict () {

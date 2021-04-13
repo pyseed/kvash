@@ -76,6 +76,11 @@ export -f callback
 ${program} list foreach key callback
 item is passed as \$1 in callback
 
+list sorted foreach:
+export -f callback
+${program} list sforeach key callback
+item is passed as \$1 in callback
+
 dict set prop:
 ${program} dict set key prop value comment
 
@@ -272,6 +277,24 @@ handler_list_foreach () {
 
     # remove empty lines
     sed '/^$/d' "${store}/${key}" > "${store}/${key}.tmp"
+
+    while read item; do "${callback}" "${item}"; done < "${store}/${key}.tmp"
+
+    rm "${store}/${key}.tmp"
+}
+
+# list sforeach key callback
+# item will be $1 in callback
+# sorted foreach
+handler_list_sforeach () {
+    local key="$1"
+    local callback="$2"
+
+    checkArg key "${key}"
+    checkArg callback "${callback}"
+
+    # remove empty lines + sort
+    sed '/^$/d' "${store}/${key}" | sort > "${store}/${key}.tmp"
 
     while read item; do "${callback}" "${item}"; done < "${store}/${key}.tmp"
 
