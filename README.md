@@ -2,6 +2,8 @@
 
 lite file based key value store in bash
 
+LICENSE: MIT
+
 ## getting started
 
 ```
