@@ -7,10 +7,12 @@ LICENSE: MIT
 ## getting started
 
 ```
-wget -O kvash https://raw.githubusercontent.com/pyseed/kvash/master/kvash
-chmod u+x ./kvash
+wget -O $HOME/.local/bin/kvash https://raw.githubusercontent.com/pyseed/kvash/master/kvash
+chmod u+x $HOME/.local/bin/kvash
 ./kvash help
 ```
+
+or install bashget https://github.com/pyseed/bashget then 'bashget add kvash pyseed'
 
 ## scope
 
