@@ -12,7 +12,7 @@ chmod u+x $HOME/.local/bin/kvash
 ./kvash help
 ```
 
-or install bashget https://github.com/pyseed/bashget then 'bashget add kvash pyseed'
+or install via bashget https://github.com/pyseed/bashget: `bashget add kvash pyseed`, this will allow to run unit tests
 
 ## scope
 
@@ -179,6 +179,8 @@ kvash dict del key prop
 ## development
 
 ### unit test
+
+(install via bashget is required)
 
 ```
 cd test

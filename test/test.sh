@@ -11,8 +11,7 @@ onAfterIt () {
     rm "${KVASH_STORE}/$1" 2> /dev/null
 }
 
-wget -O libash_test.sh https://raw.githubusercontent.com/pyseed/libash/master/test.sh
-. ./libash_test.sh
+. $(bashget get libash)/test.sh
 
 # force key value
 # setKey key value
